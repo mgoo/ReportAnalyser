@@ -1,0 +1,24 @@
+{% extends 'info_extractor/layout.html' %}
+
+{% block page-header %}
+Add new instrument
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'info_extractor:instrument_process' %}" method="post" class="form-horizontal">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="name" class="col-md-1">Name: </label>
+        <div class="col-md-3">
+            <input type="text" name="name" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="market" class="col-md-1">Market: </label>
+        <div class="col-md-3">
+            <input type="text" name="market" class="form-control">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
+{% endblock %}

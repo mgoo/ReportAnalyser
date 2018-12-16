@@ -1,0 +1,10 @@
+{% extends 'info_extractor/viewer/layout.html' %}
+{% load staticfiles%}
+
+{% block page-header %}
+    Stock Price analysis
+{% endblock %}
+
+{% block content %}
+    <a class="btn btn-primary" href="{% url 'info_extractor:stock_upload' instrument.id %}">Upload stock prices</a>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'info_extractor/viewer/layout.html' %}
+{% load staticfiles%}
+
+{% block content %}
+    <div class="report-container">
+        <iframe src="{% static report_url %}"></iframe>
+    </div>
+{% endblock %}

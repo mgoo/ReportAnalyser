@@ -1,0 +1,40 @@
+{% load staticfiles%}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Info Extractor</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="{% static "css/styles.css" %}">
+
+    {% block requiruments %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-primary">
+        <a class="navbar-brand" href="{% url 'info_extractor:home' %}">Info Extractor</a>
+        <div class="container">
+            <ul class="nav navbar-nav">
+                <li><a href="{% url 'info_extractor:instrument_add' %}">Add</a></li>
+                <li><a href="{% url 'info_extractor:instrument_list' %}">List</a></li>
+            </ul>
+        </div>
+    </nav>
+    <nav class="navbar navbar-default navbar-secondary">
+        {% block tab-bar %}{% endblock %}
+    </nav>
+    <div class="container">
+        <div class="page-header">
+            <h1>{% block page-header %}{% endblock %}</h1>
+        </div>
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block js %}{% endblock %}
+</body>
+</html>

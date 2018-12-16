@@ -1,0 +1,15 @@
+{% extends 'info_extractor/layout.html' %}
+
+{% block page-header %}
+Instruments
+{% endblock %}
+
+{% block content %}
+    <div class="list-group">
+    {% for instrument in instruments %}
+        <a href="{% url 'info_extractor:instrument' instrument.id %}" class="list-group-item">
+            {{ instrument.name }} - {{ instrument.market }}
+        </a>
+    {% endfor %}
+    </div>
+{% endblock %}

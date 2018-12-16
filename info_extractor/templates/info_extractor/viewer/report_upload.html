@@ -1,0 +1,41 @@
+{% extends 'info_extractor/viewer/layout.html' %}
+
+{% block requiruments %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css" rel="stylesheet"/>
+{% endblock %}
+
+{% block page-header %}
+Upload
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'info_extractor:report_process' instrument.id %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="year" class="col-md-2">Year</label>
+        <div class="col-md-3">
+            <input type="text" name="year" id="datepicker" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="report" class="col-md-2">Anual Report</label>
+        <div class="col-md-3">
+            <input type="file" name="report" class="form-control">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-default">Save</button>
+</form>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#datepicker").datepicker({
+            format: "yyyy",
+            viewMode: "years",
+            minViewMode: "years"
+        }).on('changeDate', function(e){
+            $(this).datepicker('hide');
+        });
+    </script>
+{% endblock %}

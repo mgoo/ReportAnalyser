@@ -1,0 +1,19 @@
+{% extends 'info_extractor/viewer/layout.html' %}
+
+{% block page-header %}
+    Reports
+{% endblock %}
+
+{% block content %}
+    <a class="btn btn-primary" href="{% url 'info_extractor:report_upload' instrument.id %}">Upload</a>
+    <div class="list-group">
+        {% for report in reports %}
+        <a href="{% url 'info_extractor:instruments_report' instrument.id report.id %}"
+           class="list-group-item"
+        >
+            {{ report.year }}
+        </a>
+
+        {% endfor %}
+    </div>
+{% endblock %}

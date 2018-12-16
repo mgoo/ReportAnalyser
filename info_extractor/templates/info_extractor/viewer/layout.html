@@ -1,0 +1,12 @@
+{% extends 'info_extractor/layout.html' %}
+
+{% block tab-bar %}
+    <a href="{% url 'info_extractor:instrument' instrument.id %}" class="navbar-brand">
+        {{ instrument.name }} - {{ instrument.market }}
+    </a>
+    <ul class="nav navbar-nav">
+        <li><a href="{% url 'info_extractor:instrument_reports' instrument.id %}">Reports</a></li>
+        <li><a href="{% url 'info_extractor:instrument_tables' instrument.id %}">Tables</a></li>
+        <li><a href="{% url 'info_extractor:instrument_stock' instrument.id %}">Stock</a></li>
+    </ul>
+{% endblock %}

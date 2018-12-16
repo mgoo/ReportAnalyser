@@ -1,0 +1,61 @@
+{% extends 'info_extractor/viewer/layout.html' %}
+
+{% block requiruments %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+
+{% block page-header %}
+    Overview
+{% endblock %}
+
+{% block content %}
+    <div class="chart-wrapper" id="stock-price-chart"></div>
+    <div class="chart-wrapper" id="stock-volume-chart"></div>
+    <div class="chart-wrapper" id="report-polarity-chart"></div>
+{% endblock %}
+
+{% block js %}
+    {{ stock_price|json_script:"stock-price" }}
+    {{ stock_volume|json_script:"stock-volume" }}
+    {{ report_polarity|json_script:"report-polarity"}}
+
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawPriceChart);
+      google.charts.setOnLoadCallback(drawVolumeChart);
+      google.charts.setOnLoadCallback(drawPolarityChart);
+
+      function drawPriceChart() {
+        let data = google.visualization.arrayToDataTable(JSON.parse($('#stock-price').text()));
+        let options = {
+          title: 'Stock Price',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        let chart = new google.visualization.LineChart($('#stock-price-chart')[0]);
+        chart.draw(data, options);
+      }
+
+      function drawVolumeChart() {
+        let data = google.visualization.arrayToDataTable(JSON.parse($('#stock-volume').text()));
+        let options = {
+          title: 'Stock Trade Volume',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        let chart = new google.visualization.LineChart($('#stock-volume-chart')[0]);
+        chart.draw(data, options);
+      }
+
+      function drawPolarityChart() {
+        let data = google.visualization.arrayToDataTable(JSON.parse($('#report-polarity').text()));
+        let options = {
+          title: 'Annual Report Polarity',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        let chart = new google.visualization.LineChart($('#report-polarity-chart')[0]);
+        chart.draw(data, options);
+      }
+    </script>
+{% endblock %}
