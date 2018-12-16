@@ -9,8 +9,14 @@
 {% endblock %}
 
 {% block content %}
-    <div class="chart-wrapper" id="stock-price-chart"></div>
-    <div class="chart-wrapper" id="stock-volume-chart"></div>
+    <div class="chart-dashboard" id="stock-price-dashboard">
+        <div class="chart-wrapper" id="stock-price-chart"></div>
+        <div class="chart-wrapper" id="stock-price-filter"></div>
+    </div>
+    <div class="chart-dashboard" id="stock-volume-dashboard">
+        <div class="chart-wrapper" id="stock-volume-chart"></div>
+        <div class="chart-wrapper" id="stock-volume-filter"></div>
+    </div>
     <div class="chart-wrapper" id="report-polarity-chart"></div>
 {% endblock %}
 
@@ -20,39 +26,87 @@
     {{ report_polarity|json_script:"report-polarity"}}
 
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
+
+      let stock_price = JSON.parse($('#stock-price').text());
+      let stock_volume = JSON.parse($('#stock-volume').text());
+      let report_polarity = JSON.parse($('#report-polarity').text());
+
+      for (row_idx = 1; row_idx < stock_price.length; row_idx++ ) {
+        let date_components = stock_price[row_idx][0].split("-");
+        stock_price[row_idx][0] = new Date(date_components[0], date_components[1], date_components[2])
+      }
+      for (row_idx = 1; row_idx < stock_volume.length; row_idx++ ) {
+        let date_components = stock_volume[row_idx][0].split("-");
+        stock_volume[row_idx][0] = new Date(date_components[0], date_components[1], date_components[2])
+      }
+      for (row_idx = 1; row_idx < report_polarity.length; row_idx++ ) {
+        report_polarity[row_idx][0] = new Date(report_polarity[row_idx][0])
+      }
+
+      google.charts.load('current', {'packages':['corechart', 'controls']});
       google.charts.setOnLoadCallback(drawPriceChart);
       google.charts.setOnLoadCallback(drawVolumeChart);
       google.charts.setOnLoadCallback(drawPolarityChart);
 
       function drawPriceChart() {
-        let data = google.visualization.arrayToDataTable(JSON.parse($('#stock-price').text()));
-        let options = {
-          title: 'Stock Price',
-          curveType: 'function',
-          legend: { position: 'bottom' }
-        };
-        let chart = new google.visualization.LineChart($('#stock-price-chart')[0]);
-        chart.draw(data, options);
+        let data = google.visualization.arrayToDataTable(stock_price);
+
+        let dashboard = new google.visualization.Dashboard($('#stock-price-dashboard')[0]);
+
+        let dateFilter = new google.visualization.ControlWrapper({
+          'controlType': 'ChartRangeFilter',
+          'containerId': 'stock-price-filter',
+          'options': {
+            'filterColumnLabel': 'Date',
+            'height': 50
+          }
+        });
+
+        let chart = new google.visualization.ChartWrapper({
+          'chartType': 'LineChart',
+          'containerId': 'stock-price-chart',
+          'options': {
+            'title': 'Stock Price',
+            'legend': 'right'
+          }
+        });
+
+        dashboard.bind(dateFilter, chart);
+        dashboard.draw(data)
       }
 
       function drawVolumeChart() {
-        let data = google.visualization.arrayToDataTable(JSON.parse($('#stock-volume').text()));
-        let options = {
-          title: 'Stock Trade Volume',
-          curveType: 'function',
-          legend: { position: 'bottom' }
-        };
-        let chart = new google.visualization.LineChart($('#stock-volume-chart')[0]);
-        chart.draw(data, options);
+        let data = google.visualization.arrayToDataTable(stock_volume);
+
+        let dashboard = new google.visualization.Dashboard($('#stock-volume-dashboard')[0]);
+
+        let dateFilter = new google.visualization.ControlWrapper({
+          'controlType': 'ChartRangeFilter',
+          'containerId': 'stock-volume-filter',
+          'options': {
+            'filterColumnLabel': 'Date',
+            'height': 50
+          }
+        });
+
+        let chart = new google.visualization.ChartWrapper({
+          'chartType': 'LineChart',
+          'containerId': 'stock-volume-chart',
+          'options': {
+            'title': 'Volume Traded',
+            'legend': 'right'
+          }
+        });
+
+        dashboard.bind(dateFilter, chart);
+        dashboard.draw(data)
       }
 
       function drawPolarityChart() {
-        let data = google.visualization.arrayToDataTable(JSON.parse($('#report-polarity').text()));
+        let data = google.visualization.arrayToDataTable(report_polarity);
         let options = {
           title: 'Annual Report Polarity',
-          curveType: 'function',
-          legend: { position: 'bottom' }
+          legend: { position: 'right' }
         };
         let chart = new google.visualization.LineChart($('#report-polarity-chart')[0]);
         chart.draw(data, options);

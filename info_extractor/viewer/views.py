@@ -14,7 +14,6 @@ def home(request, instrument_id):
     # Data for graphs
     stock_price = []
     stock_volume = []
-    report_polarity = []
 
     if csv_exists('stock_prices', instrument.name):
         stock_data_frame = extract_csv('stock_prices', instrument.name)
