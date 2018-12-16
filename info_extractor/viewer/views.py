@@ -53,14 +53,14 @@ def report(request, instrument_id, report_id):
     report = get_object_or_404(ReportAnalysis, id=report_id)
     filename = "report_%s" % report.year
 
-    report_url = "file_store/html/%s/%s/%s_formatted-html.html" % (instrument.name, report.year, filename)
+    report_html = read_htmlfile("report_%s_formatted-html" % (report.year), instrument.name, report.year)
 
     template = loader.get_template('info_extractor/viewer/report.html')
     context = {
         'instrument': instrument,
         'report': report,
         'filename': filename,
-        'report_url': report_url
+        'report_html': report_html
     }
     return HttpResponse(template.render(context, request))
 

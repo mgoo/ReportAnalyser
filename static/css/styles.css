@@ -12,3 +12,7 @@ html,body { height:100%; }
     border-bottom: #006284 solid 3px;
 }
 
+.report-container > div {
+    box-shadow: #1d1d1b 3px 3px 5px;
+}
+
