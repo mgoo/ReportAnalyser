@@ -1,5 +1,15 @@
 {% extends 'info_extractor/viewer/layout.html' %}
 
 {% block page-header %}
-    Tables
+  Tables
+{% endblock %}
+
+{% block content %}
+  {% for report_tables in tables %}
+    <h2>{{ report_tables.year }}</h2>
+
+    <div class="tables-container">
+      {{ report_tables.html|safe }}
+    </div>
+  {% endfor %}
 {% endblock %}

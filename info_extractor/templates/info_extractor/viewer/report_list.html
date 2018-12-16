@@ -9,8 +9,7 @@
     <div class="list-group">
         {% for report in reports %}
         <a href="{% url 'info_extractor:instruments_report' instrument.id report.id %}"
-           class="list-group-item"
-        >
+           class="list-group-item">
             {{ report.year }}
         </a>
 

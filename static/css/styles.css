@@ -16,3 +16,7 @@ html,body { height:100%; }
     box-shadow: #1d1d1b 3px 3px 5px;
 }
 
+.tables-container > table {
+    box-shadow: #4a4a49 1px 1px 4px;
+    padding: 20px;
+}

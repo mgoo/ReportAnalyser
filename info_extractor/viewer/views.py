@@ -67,7 +67,17 @@ def report(request, instrument_id, report_id):
 def tables(request, instrument_id):
     instrument = get_object_or_404(Instrument, id=instrument_id)
     template = loader.get_template('info_extractor/viewer/tables.html')
-    return HttpResponse(template.render({'instrument': instrument}, request))
+
+    reports = ReportAnalysis.objects.filter(instrument_id=instrument.id).order_by('-year')
+    tables = list(map(
+        lambda report: {'year': report.year, 'html': read_htmlfile('report_%s_tables' % report.year, instrument.name, report.year)},
+        reports
+    ))
+    context = {
+        'instrument': instrument,
+        'tables': tables
+    }
+    return HttpResponse(template.render(context, request))
 
 
 def stock(request, instrument_id):
