@@ -4,6 +4,7 @@ from django.conf import settings
 
 from . import views
 from .viewer import views as viewer_views
+from .trader import views as trader_views
 
 app_name = 'info_extractor'
 
@@ -24,5 +25,8 @@ urlpatterns = [
     path('instrument/<int:instrument_id>/reports', viewer_views.reports, name='instrument_reports'),
     path('instrument/<int:instrument_id>/report/<int:report_id>', viewer_views.report, name='instruments_report'),
     path('instrument/<int:instrument_id>/tables', viewer_views.tables, name='instrument_tables'),
-    path('instrument/<int:instrument_id>/stock', viewer_views.stock, name='instrument_stock')
+    path('instrument/<int:instrument_id>/stock', viewer_views.stock, name='instrument_stock'),
+
+    path('trader/list', trader_views.list, name='trader_list'),
+
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
