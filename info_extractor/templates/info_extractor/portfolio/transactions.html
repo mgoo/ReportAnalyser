@@ -1,0 +1,14 @@
+{% extends 'info_extractor/portfolio/layout.html' %}
+
+{% block page-header %}
+  Transactions
+{% endblock %}
+
+{% block content %}
+  <a class="btn btn-primary" href="{% url 'info_extractor:portfolio_add' %}">+</a>
+  <div class="list-group">
+    {% for transaction in transactions %}
+      <div>{{ transaction.instrument.name }}  - {{ transaction.instrument.market }} -  {{ transaction.amount }} - {{ transaction.price }}</div>
+    {% endfor %}
+  </div>
+{% endblock %}

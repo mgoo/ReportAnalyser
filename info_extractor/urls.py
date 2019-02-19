@@ -5,6 +5,7 @@ from django.conf import settings
 from . import views
 from .viewer import views as viewer_views
 from .trader import views as trader_views
+from .portfolio import views as portfolio_views
 
 app_name = 'info_extractor'
 
@@ -28,5 +29,10 @@ urlpatterns = [
     path('instrument/<int:instrument_id>/stock', viewer_views.stock, name='instrument_stock'),
 
     path('trader/list', trader_views.list, name='trader_list'),
+
+    path('portfolio/transactions', portfolio_views.transactions, name='portfolio_transactions'),
+    path('portfolio/position', portfolio_views.current_position, name='portfolio_position'),
+    path('portfolio/add_transaction', portfolio_views.add_transaction, name='portfolio_add'),
+    path('portfolio/process_add_transaction', portfolio_views.process_add_transaction, name='portfolio_process_add_transaction')
 
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -16,3 +16,13 @@ class ReportAnalysis(models.Model):
 
     def __str__(self):
         return "Report Analysis {id: %d}" % self.id
+
+
+class Transaction(models.Model):
+    instrument = models.ForeignKey(Instrument, on_delete=models.DO_NOTHING)
+    amount = models.FloatField()
+    price = models.FloatField()
+    date = models.DateTimeField()
+
+    def __str__(self):
+        return "Transaction {id: %d}" % self.id

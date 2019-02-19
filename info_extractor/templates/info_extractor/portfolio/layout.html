@@ -1,0 +1,11 @@
+{% extends 'info_extractor/layout.html' %}
+
+{% block tab-bar %}
+    <div class="navbar-brand">
+        Portfolio
+    </div>
+    <ul class="nav navbar-nav">
+        <li><a href="{% url 'info_extractor:portfolio_position' %}">Position</a></li>
+        <li><a href="{% url 'info_extractor:portfolio_transactions' %}">Transactions</a></li>
+    </ul>
+{% endblock %}
