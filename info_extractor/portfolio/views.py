@@ -4,6 +4,7 @@ from django.template import loader
 from django.urls import reverse
 
 from info_extractor.models import Transaction, Instrument
+from info_extractor.portfolio.lib import get_current_positions
 
 
 def transactions(request):
@@ -13,9 +14,12 @@ def transactions(request):
 
 
 def current_position(request):
-    # TODO
     template = loader.get_template('info_extractor/portfolio/currrent_position.html')
-    return HttpResponse(template.render({}, request))
+
+    transaction_list = Transaction.objects.all()
+    positions = get_current_positions(transaction_list)
+    context = {'positions': positions}
+    return HttpResponse(template.render({'positions': positions}, request))
 
 
 def add_transaction(request):

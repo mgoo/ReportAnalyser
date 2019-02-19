@@ -8,6 +8,12 @@ class Instrument(models.Model):
     def __str__(self):
         return self.name + ' - ' + self.market
 
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return self.id == other.id
+
 
 class ReportAnalysis(models.Model):
     instrument = models.ForeignKey(Instrument, on_delete=models.DO_NOTHING)
