@@ -3,8 +3,9 @@ from django.shortcuts import get_object_or_404
 from django.template import loader
 from django.urls import reverse
 
+from info_extractor.lib.portfolio_helpers import get_current_positions
 from info_extractor.models import Transaction, Instrument
-from info_extractor.portfolio.lib import get_current_positions
+
 
 
 def transactions(request):
@@ -18,7 +19,7 @@ def current_position(request):
 
     transaction_list = Transaction.objects.all()
     positions = get_current_positions(transaction_list)
-    context = {'positions': positions}
+
     return HttpResponse(template.render({'positions': positions}, request))
 
 
