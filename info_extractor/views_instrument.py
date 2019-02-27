@@ -4,29 +4,28 @@ from django.template import loader
 from django.urls import reverse
 
 from info_extractor.lib.html_extractor import read_htmlfile
-from info_extractor.lib.stock_price_extractor import csv_exists, extract_csv, save_csv_file
+from info_extractor.lib.stock_price_extractor import extract_csv, save_csv_file
 
 from info_extractor.lib.html_extractor import save_pdf_file, pdf_to_htmlfile, html_to_text
 from info_extractor.lib.text_analyser import semantic_analysis
-from info_extractor.models import Instrument, ReportAnalysis
+from info_extractor.models import Instrument, ReportAnalysis, HistoricPrices
 
 
 def home(request, instrument_id):
     instrument = get_object_or_404(Instrument, id=instrument_id)
     template = loader.get_template('info_extractor/instrument/home.html')
 
-    # Data for graphs
-    stock_price = []
-    stock_volume = []
+    stock_data = HistoricPrices.\
+        objects.\
+        filter(instrument_id=instrument.id).\
+        order_by('date').\
+        values()
 
-    if csv_exists('stock_prices', instrument.name):
-        stock_data_frame = extract_csv('stock_prices', instrument.name)
+    stock_price = [(row['date'], row['close']) for row in stock_data]
+    stock_price.insert(0, ('Date', 'Price'))
 
-        stock_price = stock_data_frame[['Date', 'Open']].values.tolist()
-        stock_price = [['Date', 'Open']] + stock_price
-
-        stock_volume = stock_data_frame[['Date', 'Volume']].values.tolist()
-        stock_volume = [['Date', 'Volume']] + stock_volume
+    stock_volume = [(row['date'], row['close']) for row in stock_data]
+    stock_volume.insert(0, ('Date', 'Volume'))
 
     report_polarity = list(map(
         lambda report_analysis: [repr(report_analysis.year), report_analysis.polarity],
@@ -77,6 +76,26 @@ def stock_process(request, instrument_id):
 
     save_csv_file(request.FILES['stock_file'], 'stock_prices', instrument.name)
 
+    price_data = extract_csv('stock_prices', instrument.name)
+    price_data = price_data.dropna(axis=0)
+
+    for idx, row in price_data.iterrows():
+        # if the there is already data for the instrumnet at that date then dont update
+        if HistoricPrices.objects.filter(instrument_id=instrument.id, date=row.Date).exists():
+            continue
+
+        historic_price = HistoricPrices(
+            instrument_id=instrument.id,
+            date=row.Date,
+            open=row.Open,
+            high=row.High,
+            low=row.Low,
+            close=row.Close,
+            adj_close=row['Adj Close'],
+            volume=row.Volume
+        )
+        historic_price.save()
+
     return HttpResponseRedirect(reverse('info_extractor:instrument', args=(instrument.id, )))
 
 
@@ -95,6 +114,7 @@ def instrument_process(request):
     instrument_obj = Instrument(name=request.POST.get('name'), market=request.POST.get('market'))
     instrument_obj.save()
     return HttpResponseRedirect(reverse('info_extractor:instrument', args=(instrument_obj.id, )))
+
 
 
 def reports(request, instrument_id):

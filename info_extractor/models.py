@@ -32,3 +32,17 @@ class Transaction(models.Model):
 
     def __str__(self):
         return "Transaction {id: %d}" % self.id
+
+
+class HistoricPrices(models.Model):
+    instrument = models.ForeignKey(Instrument, on_delete=models.DO_NOTHING)
+    date = models.DateField()
+    open = models.FloatField()
+    high = models.FloatField()
+    low = models.FloatField()
+    close = models.FloatField()
+    adj_close = models.FloatField()
+    volume = models.IntegerField()
+
+    def __str__(self):
+        return "Historic Price {id: %d}" % self.id
