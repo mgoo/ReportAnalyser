@@ -4,6 +4,7 @@ from django.template import loader
 from django.urls import reverse
 
 from info_extractor.lib.html_extractor import read_htmlfile
+from info_extractor.lib.scraper import get_scraper
 from info_extractor.lib.stock_price_extractor import extract_csv, save_csv_file
 
 from info_extractor.lib.html_extractor import save_pdf_file, pdf_to_htmlfile, html_to_text
@@ -163,3 +164,12 @@ def stock(request, instrument_id):
     instrument = get_object_or_404(Instrument, id=instrument_id)
     template = loader.get_template('info_extractor/instrument/stock.html')
     return HttpResponse(template.render({'instrument': instrument}, request))
+
+
+def analysis(request, instrument_id):
+    instrument = get_object_or_404(Instrument, id=instrument_id)
+    template = loader.get_template('info_extractor/instrument/analysis.html')
+
+    html = get_scraper(instrument.market).scrape_analysis(instrument)
+
+    return HttpResponse(template.render({'instrument': instrument, 'analysis': html}, request))

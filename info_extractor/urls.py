@@ -24,6 +24,7 @@ urlpatterns = [
     path('instrument/<int:instrument_id>/report/<int:report_id>', views_instrument.report, name='instruments_report'),
     path('instrument/<int:instrument_id>/tables', views_instrument.tables, name='instrument_tables'),
     path('instrument/<int:instrument_id>/stock', views_instrument.stock, name='instrument_stock'),
+    path('instrument/<int:instrument_id>/analysis', views_instrument.analysis, name='instrument_analysis'),
 
     path('trader/list', views_trader.list, name='trader_list'),
 
