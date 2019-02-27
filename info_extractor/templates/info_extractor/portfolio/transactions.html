@@ -1,14 +1,40 @@
 {% extends 'info_extractor/portfolio/layout.html' %}
 
+{% block requiruments %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css"/>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js"></script>
+{% endblock %}
+
 {% block page-header %}
   Transactions
 {% endblock %}
 
 {% block content %}
   <a class="btn btn-primary" href="{% url 'info_extractor:portfolio_add' %}">+</a>
-  <div class="list-group">
+  <table id="transaction_list" class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Instrument</th>
+        <th>Amount</th>
+        <th>Price</th>
+      </tr>
+    </thead>
     {% for transaction in transactions %}
-      <div>{{ transaction.instrument.name }}  - {{ transaction.instrument.market }} -  {{ transaction.amount }} - {{ transaction.price }}</div>
+    <tr>
+      <td>{{ transaction.date | date:'Y-m-d' }}</td>
+      <td>{{ transaction.instrument.name }}  - {{ transaction.instrument.market }}</td>
+      <td>{{ transaction.amount }}</td>
+      <td>{{ transaction.price }}</td>
+    </tr>
     {% endfor %}
-  </div>
+  </table>
+{% endblock %}
+
+{% block js %}
+  <script>
+    $(document).ready(function() {
+      $('#transaction_list').DataTable();
+    })
+  </script>
 {% endblock %}
