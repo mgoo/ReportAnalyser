@@ -22,10 +22,10 @@ def home(request, instrument_id):
         order_by('date').\
         values()
 
-    stock_price = [(row['date'], row['close']) for row in stock_data]
-    stock_price.insert(0, ('Date', 'Price'))
+    stock_price = [(row['date'], row['low'], row['open'], row['close'], row['high']) for row in stock_data]
+    stock_price.insert(0, ('Date', 'Low', 'Open', 'Close', 'High'))
 
-    stock_volume = [(row['date'], row['close']) for row in stock_data]
+    stock_volume = [(row['date'], row['volume']) for row in stock_data]
     stock_volume.insert(0, ('Date', 'Volume'))
 
     report_polarity = list(map(

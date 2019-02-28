@@ -58,21 +58,21 @@
           'containerId': 'stock-price-filter',
           'options': {
             'filterColumnLabel': 'Date',
-            'height': 50
+            'height': 20
           }
         });
 
         let chart = new google.visualization.ChartWrapper({
-          'chartType': 'LineChart',
+          'chartType': 'CandlestickChart',
           'containerId': 'stock-price-chart',
           'options': {
             'title': 'Stock Price',
-            'legend': 'right'
+            'legend': 'none'
           }
         });
 
         dashboard.bind(dateFilter, chart);
-        dashboard.draw(data)
+        dashboard.draw(data);
       }
 
       function drawVolumeChart() {
