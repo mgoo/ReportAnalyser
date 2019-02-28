@@ -15,12 +15,14 @@
       <tr>
         <th>Instrument</th>
         <th>Amount</th>
+        <th>Value</th>
       </tr>
     </thead>
-    {% for instrument, amount in positions.items %}
+    {% for instrument, position in positions.items %}
     <tr>
       <td>{{ instrument.name }}  - {{ instrument.market }}</td>
-      <td>{{ amount }}</td>
+      <td>{{ position.amount }}</td>
+      <td>{{ position.value }}</td>
     </tr>
     {% endfor %}
   </table>

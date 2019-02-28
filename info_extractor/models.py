@@ -5,6 +5,26 @@ class Instrument(models.Model):
     name = models.CharField(max_length=8)
     market = models.CharField(max_length=5)
 
+    def get_current_price(self) -> float:
+        date = HistoricPrices.objects\
+            .filter(instrument_id=self.id)\
+            .latest('date')\
+            .date
+
+        return HistoricPrices.objects\
+            .filter(date=date, instrument_id=self.id)\
+            .values('close')[0]['close']
+
+    def get_price_history(self):
+        query_result = HistoricPrices.objects\
+            .filter(instrument_id=self.id)\
+            .values('close', 'date')
+
+        history = {instance['date'].strftime('%Y-%m-%d'): instance['close'] for instance in query_result}
+
+        return history
+
+
     def __str__(self):
         return self.name + ' - ' + self.market
 

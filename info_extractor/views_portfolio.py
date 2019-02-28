@@ -20,6 +20,11 @@ def current_position(request):
     transaction_list = Transaction.objects.all()
     positions = get_current_positions(transaction_list)
 
+    positions = {
+        instrument: {'amount': amount, 'value': amount * instrument.get_current_price()}
+        for instrument, amount in positions.items()
+    }
+
     return HttpResponse(template.render({'positions': positions}, request))
 
 
