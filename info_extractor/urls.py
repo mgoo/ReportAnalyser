@@ -12,7 +12,6 @@ urlpatterns = [
     path('instrument/<int:instrument_id>/report/upload', views_instrument.report_upload, name='report_upload'),
     path('instrument/<int:instrument_id>/report/process', views_instrument.report_process, name='report_process'),
 
-    path('instrument/<int:instrument_id>/stock/upload', views_instrument.stock_upload, name='stock_upload'),
     path('instrument/<int:instrument_id>/stock/process', views_instrument.stock_process, name='stock_process'),
 
     path('instrument/list', views_instrument.instrument_list, name='instrument_list'),
@@ -23,7 +22,7 @@ urlpatterns = [
     path('instrument/<int:instrument_id>/reports', views_instrument.reports, name='instrument_reports'),
     path('instrument/<int:instrument_id>/report/<int:report_id>', views_instrument.report, name='instruments_report'),
     path('instrument/<int:instrument_id>/tables', views_instrument.tables, name='instrument_tables'),
-    path('instrument/<int:instrument_id>/stock', views_instrument.stock, name='instrument_stock'),
+    path('instrument/<int:instrument_id>/stock', views_instrument.stock_upload, name='instrument_stock'),
     path('instrument/<int:instrument_id>/analysis', views_instrument.analysis, name='instrument_analysis'),
 
     path('trader/list', views_trader.list, name='trader_list'),

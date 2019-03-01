@@ -73,7 +73,7 @@ def stock_upload(request, instrument_id):
 
 
 def stock_process(request, instrument_id):
-    instrument  = get_object_or_404(Instrument, id = instrument_id)
+    instrument = get_object_or_404(Instrument, id = instrument_id)
 
     save_csv_file(request.FILES['stock_file'], 'stock_prices', instrument.name)
 
@@ -158,12 +158,6 @@ def tables(request, instrument_id):
         'tables': tables
     }
     return HttpResponse(template.render(context, request))
-
-
-def stock(request, instrument_id):
-    instrument = get_object_or_404(Instrument, id=instrument_id)
-    template = loader.get_template('info_extractor/instrument/stock.html')
-    return HttpResponse(template.render({'instrument': instrument}, request))
 
 
 def analysis(request, instrument_id):
