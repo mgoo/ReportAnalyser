@@ -9,7 +9,7 @@ from info_extractor.lib.stock_price_extractor import extract_csv, save_csv_file
 
 from info_extractor.lib.html_extractor import save_pdf_file, pdf_to_htmlfile, html_to_text
 from info_extractor.lib.text_analyser import semantic_analysis
-from info_extractor.models import Instrument, ReportAnalysis, HistoricPrices
+from info_extractor.models import Instrument, ReportAnalysis, HistoricPrices, Dividend
 
 
 def home(request, instrument_id):
@@ -72,10 +72,8 @@ def stock_upload(request, instrument_id):
     return HttpResponse(template.render({'instrument': instrument}, request))
 
 
-def stock_process(request, instrument_id):
-    instrument = get_object_or_404(Instrument, id = instrument_id)
-
-    save_csv_file(request.FILES['stock_file'], 'stock_prices', instrument.name)
+def _process_price_data(file, instrument):
+    save_csv_file(file, 'stock_prices', instrument.name)
 
     price_data = extract_csv('stock_prices', instrument.name)
     price_data = price_data.dropna(axis=0)
@@ -97,6 +95,34 @@ def stock_process(request, instrument_id):
         )
         historic_price.save()
 
+
+def _process_dividend_data(file, instrument):
+    save_csv_file(file, 'dividends', instrument.name)
+
+    div_data = extract_csv('dividends', instrument.name)
+    div_data = div_data.dropna(axis=0)
+
+    for idx, row in div_data.iterrows():
+        # if the there is already data for the instrumnet at that date then dont update
+        if Dividend.objects.filter(instrument_id=instrument.id, date=row.Date).exists():
+            continue
+
+        div = Dividend(
+            instrument_id=instrument.id,
+            date=row.Date,
+            dps=row.Dividends
+        )
+        div.save()
+
+
+def stock_process(request, instrument_id):
+    instrument = get_object_or_404(Instrument, id = instrument_id)
+
+    if 'stock_file' in request.FILES:
+        _process_price_data(request.FILES['stock_file'], instrument)
+    if 'div_file' in request.FILES:
+        _process_dividend_data(request.FILES['div_file'], instrument)
+
     return HttpResponseRedirect(reverse('info_extractor:instrument', args=(instrument.id, )))
 
 
@@ -115,7 +141,6 @@ def instrument_process(request):
     instrument_obj = Instrument(name=request.POST.get('name'), market=request.POST.get('market'))
     instrument_obj.save()
     return HttpResponseRedirect(reverse('info_extractor:instrument', args=(instrument_obj.id, )))
-
 
 
 def reports(request, instrument_id):

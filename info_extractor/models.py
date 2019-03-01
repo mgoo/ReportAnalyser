@@ -66,3 +66,12 @@ class HistoricPrices(models.Model):
 
     def __str__(self):
         return "Historic Price {id: %d}" % self.id
+
+
+class Dividend(models.Model):
+    instrument = models.ForeignKey(Instrument, on_delete=models.DO_NOTHING)
+    date = models.DateField()
+    dps = models.FloatField()
+
+    def __str__(self):
+        return "Dividend {id: %d}" % self.id
