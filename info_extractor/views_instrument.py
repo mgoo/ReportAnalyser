@@ -1,7 +1,10 @@
+import datetime
+
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
+from django.db.models import Sum
 
 from info_extractor.lib.html_extractor import read_htmlfile
 from info_extractor.lib.scraper import get_scraper
@@ -9,37 +12,63 @@ from info_extractor.lib.stock_price_extractor import extract_csv, save_csv_file
 
 from info_extractor.lib.html_extractor import save_pdf_file, pdf_to_htmlfile, html_to_text
 from info_extractor.lib.text_analyser import semantic_analysis
+
 from info_extractor.models import Instrument, ReportAnalysis, HistoricPrices, Dividend
 
 
 def home(request, instrument_id):
     instrument = get_object_or_404(Instrument, id=instrument_id)
     template = loader.get_template('info_extractor/instrument/home.html')
-
-    stock_data = HistoricPrices.\
-        objects.\
-        filter(instrument_id=instrument.id).\
-        order_by('date').\
-        values()
-
-    stock_price = [(row['date'], row['low'], row['open'], row['close'], row['high']) for row in stock_data]
-    stock_price.insert(0, ('Date', 'Low', 'Open', 'Close', 'High'))
-
-    stock_volume = [(row['date'], row['volume']) for row in stock_data]
-    stock_volume.insert(0, ('Date', 'Volume'))
-
-    report_polarity = list(map(
-        lambda report_analysis: [repr(report_analysis.year), report_analysis.polarity],
-        ReportAnalysis.objects.filter(instrument_id=instrument.id).order_by('year')
-    ))
-    report_polarity = [['Year', 'Polarity']] + report_polarity
+    one_year_ago = datetime.datetime.now() - datetime.timedelta(days=365)
 
     context = {
         'instrument': instrument,
-        'stock_price': stock_price,
-        'stock_volume': stock_volume,
-        'report_polarity': report_polarity
     }
+
+    try:
+        stock_data = HistoricPrices. \
+            objects. \
+            filter(instrument_id=instrument.id). \
+            order_by('date'). \
+            values()
+
+        stock_price = [(row['date'], row['low'], row['open'], row['close'], row['high']) for row in stock_data]
+        stock_price.insert(0, ('Date', 'Low', 'Open', 'Close', 'High'))
+
+        stock_volume = [(row['date'], row['volume']) for row in stock_data]
+        stock_volume.insert(0, ('Date', 'Volume'))
+
+        price_one_year_ago = HistoricPrices.objects \
+            .filter(instrument_id=instrument.id, date=one_year_ago) \
+            .values('close')[0]['close']
+        price_change = (instrument.get_current_price() - price_one_year_ago) / price_one_year_ago * 100
+
+        context['stock_price'] = stock_price
+        context['stock_volume'] = stock_volume
+        context['price_change'] = price_change
+    except:
+        print("Instrument", instrument, "does not have price data")
+
+    try:
+        annual_div = Dividend.objects \
+            .filter(instrument_id=instrument.id, date__gt=one_year_ago) \
+            .aggregate(Sum('dps'))['dps__sum']
+        div_rate = annual_div / instrument.get_current_price() * 100
+        context['div_rate'] = div_rate
+    except:
+        print("Instrument", instrument, "does not have dividend data")
+
+    try:
+        report_polarity = list(map(
+            lambda report_analysis: [repr(report_analysis.year), report_analysis.polarity],
+            ReportAnalysis.objects.filter(instrument_id=instrument.id).order_by('year')
+        ))
+        report_polarity = [['Year', 'Polarity']] + report_polarity
+
+        context['report_polarity'] = report_polarity
+    except:
+        print("Instrument", instrument, "does not have report polarity data")
+
     return HttpResponse(template.render(context, request))
 
 

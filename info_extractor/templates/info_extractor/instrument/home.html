@@ -9,6 +9,13 @@
 {% endblock %}
 
 {% block content %}
+
+    <div>
+      <span>Dividend Yeild: </span><span>{{ div_rate|floatformat }}%</span>
+      <span>Price Change: </span><span>{{ price_change|floatformat }}%</span>
+    </div>
+    <hr>
+
     <div class="chart-dashboard" id="stock-price-dashboard">
         <div class="chart-wrapper" id="stock-price-chart"></div>
         <div class="chart-wrapper" id="stock-price-filter"></div>
