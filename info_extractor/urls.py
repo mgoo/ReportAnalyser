@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
 
-from . import views, views_trader, views_instrument, views_portfolio
+from . import views, views_trader, views_instrument, views_portfolio, views_compare
 
 app_name = 'info_extractor'
 
@@ -30,6 +30,11 @@ urlpatterns = [
     path('portfolio/transactions', views_portfolio.transactions, name='portfolio_transactions'),
     path('portfolio/position', views_portfolio.current_position, name='portfolio_position'),
     path('portfolio/add_transaction', views_portfolio.add_transaction, name='portfolio_add'),
-    path('portfolio/process_add_transaction', views_portfolio.process_add_transaction, name='portfolio_process_add_transaction')
+    path('portfolio/process_add_transaction', views_portfolio.process_add_transaction, name='portfolio_process_add_transaction'),
+
+    path('compare/home', views_compare.home, name='compare_home'),
+    path('compare/timeperiod', views_compare.compare_time_period, name='compare_timeperiod'),
+    path('compare/timeperiodresults', views_compare.compare_time_period_results, name='compare_timeperiod_results'),
+    path('compare/timeseries', views_compare.compare_time_series, name='compare_timeseries')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

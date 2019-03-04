@@ -1,4 +1,6 @@
 {% extends 'info_extractor/portfolio/layout.html' %}
+{% load humanize %}
+
 
 {% block requiruments %}
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css"/>
@@ -21,8 +23,8 @@
     {% for instrument, position in positions.items %}
     <tr>
       <td>{{ instrument.name }}  - {{ instrument.market }}</td>
-      <td>{{ position.amount }}</td>
-      <td>{{ position.value }}</td>
+      <td>{{ position.amount|floatformat:"0"|intcomma }}</td>
+      <td>{{ position.value|floatformat:"2"|intcomma }}</td>
     </tr>
     {% endfor %}
   </table>

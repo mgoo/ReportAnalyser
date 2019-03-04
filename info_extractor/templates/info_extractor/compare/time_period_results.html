@@ -1,0 +1,39 @@
+{% extends 'info_extractor/compare/layout.html' %}
+{% load humanize %}
+
+{% block requiruments %}
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css"/>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js"></script>
+{% endblock %}
+
+{% block page-header %}
+  Compare instruments over a time period
+{% endblock %}
+
+{% block content %}
+  <table id="comparison" class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        {% for title in titles %}
+          <th>{{ title }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    {% for row in data %}
+      <tr>
+      {% for datum in row %}
+        <td>{{ datum }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
+
+
+{% block js %}
+  <script>
+    $(document).ready(function() {
+      $('#comparison').DataTable();
+    })
+  </script>
+{% endblock %}

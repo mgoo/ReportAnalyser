@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Max
 
 
 class Instrument(models.Model):
@@ -24,6 +25,14 @@ class Instrument(models.Model):
 
         return history
 
+    def get_price_at(self, date) -> float:
+        most_recent_date = HistoricPrices.objects \
+            .filter(instrument_id=self.id, date__lte=date) \
+            .aggregate(Max('date'))['date__max']
+
+        return HistoricPrices.objects\
+            .filter(date=most_recent_date, instrument_id=self.id)\
+            .values('close')[0]['close']
 
     def __str__(self):
         return self.name + ' - ' + self.market

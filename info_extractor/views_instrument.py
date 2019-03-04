@@ -12,6 +12,7 @@ from info_extractor.lib.stock_price_extractor import extract_csv, save_csv_file
 
 from info_extractor.lib.html_extractor import save_pdf_file, pdf_to_htmlfile, html_to_text
 from info_extractor.lib.text_analyser import semantic_analysis
+from info_extractor.metrics import PriceChange, DividendYieldAt
 
 from info_extractor.models import Instrument, ReportAnalysis, HistoricPrices, Dividend
 
@@ -20,6 +21,7 @@ def home(request, instrument_id):
     instrument = get_object_or_404(Instrument, id=instrument_id)
     template = loader.get_template('info_extractor/instrument/home.html')
     one_year_ago = datetime.datetime.now() - datetime.timedelta(days=365)
+    now = datetime.datetime.now()
 
     context = {'instrument': instrument}
 
@@ -36,13 +38,7 @@ def home(request, instrument_id):
         stock_volume = [(row['date'], row['volume']) for row in stock_data]
         stock_volume.insert(0, ('Date', 'Volume'))
 
-        date_price_one_year_ago = HistoricPrices.objects\
-            .filter(instrument_id=instrument.id, date__lte=one_year_ago) \
-            .aggregate(Max('date'))['date__max']
-        price_one_year_ago = HistoricPrices.objects \
-            .filter(instrument_id=instrument.id, date=date_price_one_year_ago) \
-            .values('close')[0]['close']
-        price_change = (instrument.get_current_price() - price_one_year_ago) / price_one_year_ago * 100
+        price_change = PriceChange().process(instrument, one_year_ago, now)
 
         context['stock_price'] = stock_price
         context['stock_volume'] = stock_volume
@@ -51,11 +47,7 @@ def home(request, instrument_id):
         print("Instrument", instrument, "does not have price data")
 
     try:
-        annual_div = Dividend.objects \
-            .filter(instrument_id=instrument.id, date__gt=one_year_ago) \
-            .aggregate(Sum('dps'))['dps__sum']
-        div_rate = annual_div / instrument.get_current_price() * 100
-        context['div_rate'] = div_rate
+        context['div_rate'] = DividendYieldAt().process(instrument, one_year_ago, now)
     except:
         print("Instrument", instrument, "does not have dividend data")
 

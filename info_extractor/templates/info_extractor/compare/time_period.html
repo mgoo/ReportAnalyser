@@ -1,0 +1,101 @@
+{% extends 'info_extractor/compare/layout.html' %}
+{% load staticfiles%}
+
+{% block requiruments %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" crossorigin="anonymous">
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
+  <link href="{% static "css/bootstrap-multiselect.css" %}" rel="stylesheet" type="text/css" />
+  <script src="{% static "js/bootstrap-multiselect.js" %}" type="text/javascript"></script>
+{% endblock %}
+
+{% block page-header %}
+Compare instruments over a time period
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <form action="{% url 'info_extractor:compare_timeperiod_results' %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+    {% csrf_token %}
+    <div class="form-group">
+
+      <label for="instruments" class="col-md-2">Instruments</label>
+      <div class="col-md-3">
+        <select name="instruments" multiple="multiple" id="instruments-select">
+          {% for instrument in instruments %}
+            <option value="{{ instrument.id }}">{{ instrument.name }} - {{ instrument.market }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+    </div>
+    <div class="form-group">
+
+      <label for="metrics" class="col-md-2">Metrics</label>
+      <select name="metrics" multiple="multiple" id="metrics-select">
+        {% for metric in available_metrics %}
+          <option value="{{ metric.class_name }}">{{ metric.name }}</option>
+        {% endfor %}
+      </select>
+
+    </div>
+
+    <div class="form-group">
+      <label for="start-date" class="col-md-2">Start Date</label>
+      <div class="col-md-8 row">
+        <div id="start-datetimepicker"></div>
+        <input id="start-date-input" name="start-date" type="hidden">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="end-date" class="col-md-2">End Date</label>
+      <div class="col-md-8 row">
+        <div id="end-datetimepicker"></div>
+        <input id="end-date-input" name="end-date" type="hidden">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-default">Compare</button>
+  </form>
+</div>
+
+<div class="row">
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#instruments-select').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true
+        });
+        $('#metrics-select').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true
+        });
+    });
+    $(function () {
+      $('#start-datetimepicker').datetimepicker({
+          inline: true,
+          useCurrent: false,
+          viewMode: 'months'
+      });
+      $('#start-datetimepicker').on('dp.change', function(event) {
+          $('#start-date-input').val(event.date.format('YYYY-MM-DD HH:mm'))
+      });
+      $('#end-datetimepicker').datetimepicker({
+          inline: true,
+          useCurrent: false,
+          viewMode: 'months'
+      });
+      $('#end-datetimepicker').on('dp.change', function(event) {
+          $('#end-date-input').val(event.date.format('YYYY-MM-DD HH:mm'))
+      });
+    });
+</script>
+{% endblock %}
