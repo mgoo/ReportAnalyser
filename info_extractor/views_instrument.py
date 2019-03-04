@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from django.db.models import Sum
+from django.db.models import Sum, Max
 
 from info_extractor.lib.html_extractor import read_htmlfile
 from info_extractor.lib.scraper import get_scraper
@@ -21,9 +21,7 @@ def home(request, instrument_id):
     template = loader.get_template('info_extractor/instrument/home.html')
     one_year_ago = datetime.datetime.now() - datetime.timedelta(days=365)
 
-    context = {
-        'instrument': instrument,
-    }
+    context = {'instrument': instrument}
 
     try:
         stock_data = HistoricPrices. \
@@ -38,8 +36,11 @@ def home(request, instrument_id):
         stock_volume = [(row['date'], row['volume']) for row in stock_data]
         stock_volume.insert(0, ('Date', 'Volume'))
 
+        date_price_one_year_ago = HistoricPrices.objects\
+            .filter(instrument_id=instrument.id, date__lte=one_year_ago) \
+            .aggregate(Max('date'))['date__max']
         price_one_year_ago = HistoricPrices.objects \
-            .filter(instrument_id=instrument.id, date=one_year_ago) \
+            .filter(instrument_id=instrument.id, date=date_price_one_year_ago) \
             .values('close')[0]['close']
         price_change = (instrument.get_current_price() - price_one_year_ago) / price_one_year_ago * 100
 
