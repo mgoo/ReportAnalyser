@@ -7,7 +7,6 @@ from info_extractor.lib.portfolio_helpers import get_current_positions
 from info_extractor.models import Transaction, Instrument
 
 
-
 def transactions(request):
     transaction_list = Transaction.objects.all()
     template = loader.get_template('info_extractor/portfolio/transactions.html')

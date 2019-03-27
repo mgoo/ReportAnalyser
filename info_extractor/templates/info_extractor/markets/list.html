@@ -1,0 +1,16 @@
+{% extends 'info_extractor/layout.html' %}
+
+{% block page-header %}
+Markets
+{% endblock %}
+
+{% block content %}
+  <a class="btn btn-primary" href="{% url 'info_extractor:market_add' %}">+</a>
+  <div class="list-group">
+  {% for market in markets %}
+    <a href="{% url 'info_extractor:market_view' market.id %}" class="list-group-item">
+      {{ market.name }}
+    </a>
+  {% endfor %}
+  </div>
+{% endblock %}

@@ -22,7 +22,7 @@
     </thead>
     {% for instrument, position in positions.items %}
     <tr>
-      <td>{{ instrument.name }}  - {{ instrument.market }}</td>
+      <td>{{ instrument.name }}  - {{ instrument.market.name }}</td>
       <td>{{ position.amount|floatformat:"0"|intcomma }}</td>
       <td>{{ position.value|floatformat:"2"|intcomma }}</td>
     </tr>

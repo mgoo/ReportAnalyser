@@ -43,7 +43,7 @@ def compare_time_period_results(request):
     titles = ['Instrument'] + [metric.get_name() for metric in metrics]
     data = []
     for instrument in instruments:
-        instrument_data = ["%s - %s" % (instrument.name, instrument.market)]
+        instrument_data = ["%s - %s" % (instrument.name, instrument.market.name)]
         for metric in metrics:
             try:
                 metric_value = round(metric.process(instrument, start_date, end_date), 2)

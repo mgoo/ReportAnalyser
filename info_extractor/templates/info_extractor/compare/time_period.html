@@ -25,7 +25,7 @@ Compare instruments over a time period
       <div class="col-md-3">
         <select name="instruments" multiple="multiple" id="instruments-select">
           {% for instrument in instruments %}
-            <option value="{{ instrument.id }}">{{ instrument.name }} - {{ instrument.market }}</option>
+            <option value="{{ instrument.id }}">{{ instrument.name }} - {{ instrument.market.name }}</option>
           {% endfor %}
         </select>
       </div>

@@ -23,7 +23,7 @@
     {% for transaction in transactions %}
     <tr>
       <td>{{ transaction.date | date:'Y-m-d' }}</td>
-      <td>{{ transaction.instrument.name }}  - {{ transaction.instrument.market }}</td>
+      <td>{{ transaction.instrument.name }}  - {{ transaction.instrument.market.name }}</td>
       <td>{{ transaction.amount }}</td>
       <td>{{ transaction.price }}</td>
     </tr>

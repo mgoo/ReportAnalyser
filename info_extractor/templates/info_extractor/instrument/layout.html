@@ -2,7 +2,7 @@
 
 {% block tab-bar %}
     <a href="{% url 'info_extractor:instrument' instrument.id %}" class="navbar-brand">
-        {{ instrument.name }} - {{ instrument.market }}
+        {{ instrument.name }} - {{ instrument.market.name }}
     </a>
     <ul class="nav navbar-nav">
         <li><a href="{% url 'info_extractor:instrument_reports' instrument.id %}">Reports</a></li>

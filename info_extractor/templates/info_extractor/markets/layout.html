@@ -1,0 +1,10 @@
+{% extends 'info_extractor/layout.html' %}
+
+{% block tab-bar %}
+    <a href="{% url 'info_extractor:market_view' market.id %}" class="navbar-brand">
+        {{ market.name }}
+    </a>
+    <ul class="nav navbar-nav">
+        <li><a href="{% url 'info_extractor:market_upload' market.id %}">Upload Data</a></li>
+    </ul>
+{% endblock %}

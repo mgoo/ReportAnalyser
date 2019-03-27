@@ -14,7 +14,7 @@ from info_extractor.lib.html_extractor import save_pdf_file, pdf_to_htmlfile, ht
 from info_extractor.lib.text_analyser import semantic_analysis
 from info_extractor.metrics import PriceChange, DividendYieldAt
 
-from info_extractor.models import Instrument, ReportAnalysis, HistoricPrices, Dividend
+from info_extractor.models import Instrument, ReportAnalysis, HistoricPrices, Dividend, Market
 
 
 def home(request, instrument_id):
@@ -156,11 +156,12 @@ def instrument_list(request):
 
 def instrument_add(request):
     template = loader.get_template('info_extractor/instrument/add.html')
-    return HttpResponse(template.render({}, request))
+    markets = Market.objects.all()
+    return HttpResponse(template.render({'markets': markets}, request))
 
 
 def instrument_process(request):
-    instrument_obj = Instrument(name=request.POST.get('name'), market=request.POST.get('market'))
+    instrument_obj = Instrument(name=request.POST.get('name'), market_id=request.POST.get('market'))
     instrument_obj.save()
     return HttpResponseRedirect(reverse('info_extractor:instrument', args=(instrument_obj.id, )))
 
@@ -211,6 +212,6 @@ def analysis(request, instrument_id):
     instrument = get_object_or_404(Instrument, id=instrument_id)
     template = loader.get_template('info_extractor/instrument/analysis.html')
 
-    html = get_scraper(instrument.market).scrape_analysis(instrument)
+    html = get_scraper(instrument.market.name).scrape_analysis(instrument)
 
     return HttpResponse(template.render({'instrument': instrument, 'analysis': html}, request))

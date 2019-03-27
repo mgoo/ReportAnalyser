@@ -2,9 +2,26 @@ from django.db import models
 from django.db.models import Max
 
 
+class Market(models.Model):
+    name = models.CharField(max_length=5)
+
+    def __str__(self):
+        return "Market {id: %d}" % self.id
+
+
+class MarketData(models.Model):
+    market = models.ForeignKey(Market, on_delete=models.DO_NOTHING)
+    measure = models.CharField(max_length=128)
+    value = models.FloatField()
+    date = models.DateField()
+
+    def __str__(self):
+        return "MarketData {id: %d}" % self.id
+
+
 class Instrument(models.Model):
     name = models.CharField(max_length=8)
-    market = models.CharField(max_length=5)
+    market = models.ForeignKey(Market, on_delete=models.DO_NOTHING)
 
     def get_current_price(self) -> float:
         date = HistoricPrices.objects\
@@ -35,7 +52,7 @@ class Instrument(models.Model):
             .values('close')[0]['close']
 
     def __str__(self):
-        return self.name + ' - ' + self.market
+        return self.name + ' - ' + self.market.name
 
     def __hash__(self):
         return hash(self.id)

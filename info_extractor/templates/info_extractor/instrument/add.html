@@ -1,7 +1,7 @@
 {% extends 'info_extractor/layout.html' %}
 
 {% block page-header %}
-Add new instrument
+Add new Instrument
 {% endblock %}
 
 {% block content %}
@@ -16,7 +16,11 @@ Add new instrument
     <div class="form-group">
         <label for="market" class="col-md-1">Market: </label>
         <div class="col-md-3">
-            <input type="text" name="market" class="form-control">
+            <select name="market" class="form-control">
+              {% for market in markets %}
+                <option value="{{ market.id }}">{{ market.name }}</option>
+              {% endfor %}
+            </select>
         </div>
     </div>
     <button type="submit" class="btn btn-default">Submit</button>

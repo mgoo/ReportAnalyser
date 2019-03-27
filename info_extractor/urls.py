@@ -2,7 +2,8 @@ from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
 
-from . import views, views_trader, views_instrument, views_portfolio, views_compare
+from . import views, views_trader, views_instrument, views_portfolio, views_compare, \
+    views_markets
 
 app_name = 'info_extractor'
 
@@ -35,6 +36,13 @@ urlpatterns = [
     path('compare/home', views_compare.home, name='compare_home'),
     path('compare/timeperiod', views_compare.compare_time_period, name='compare_timeperiod'),
     path('compare/timeperiodresults', views_compare.compare_time_period_results, name='compare_timeperiod_results'),
-    path('compare/timeseries', views_compare.compare_time_series, name='compare_timeseries')
+    path('compare/timeseries', views_compare.compare_time_series, name='compare_timeseries'),
+
+    path('market/list', views_markets.market_list, name='market_list'),
+    path('market/<int:market_id>/view', views_markets.market, name='market_view'),
+    path('market/<int:market_id>/upload', views_markets.upload_data_form, name='market_upload'),
+    path('market/<int:market_id>/process_upload', views_markets.upload_data, name='market_upload_process'),
+    path('market/add', views_markets.add_market_form, name='market_add'),
+    path('market/process_add', views_markets.add_market, name='market_add_process')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

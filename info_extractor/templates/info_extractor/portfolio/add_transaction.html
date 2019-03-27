@@ -20,7 +20,7 @@
       <div class="col-md-3">
         <select name="instrument" class="form-control">
           {% for instrument in instruments %}
-            <option value="{{ instrument.id }}">{{ instrument.name }} - {{ instrument.market }}</option>
+            <option value="{{ instrument.id }}">{{ instrument.name }} - {{ instrument.market.name }}</option>
           {% endfor %}
         </select>
       </div>
