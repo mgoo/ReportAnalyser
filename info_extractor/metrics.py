@@ -58,3 +58,15 @@ class PriceChange(Metric):
         start_price = instrument.get_price_at(start_date)
         end_price = instrument.get_price_at(end_date)
         return (end_price - start_price) / start_price * 100
+
+
+class RealPriceChange(Metric):
+
+    def get_name(self):
+        return "Real Price Change"
+
+    def process(self, instrument, start_date, end_date):
+        start_price = instrument.market.convert_price(instrument.get_price_at(start_date), start_date, end_date)
+        end_price = instrument.market.convert_price(instrument.get_price_at(end_date), end_date, end_date)
+
+        return (end_price - start_price) / start_price * 100

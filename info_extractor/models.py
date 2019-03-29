@@ -8,6 +8,33 @@ class Market(models.Model):
     def __str__(self):
         return "Market {id: %d}" % self.id
 
+    def convert_price(self, price, at_date, to_date):
+        current_cpi = self.cpi_at(at_date)
+        other_cpi = self.cpi_at(to_date)
+
+        return price * (other_cpi / current_cpi)
+
+
+    def cpi_at(self, date):
+        cpi_query = MarketData.objects.filter(market_id=self.id, measure='CPI')
+
+        after = cpi_query.filter(date__gte=date).order_by('date').values()
+        before = cpi_query.filter(date__lte=date).order_by('-date').values()
+
+        if len(after) == 0: # If the date is newer than all the data
+            return before[0]['value']
+        if len(before) == 0: # If the date is earlier than all the data
+            return after[0]['value']
+
+        after = after[0]
+        before = before[0]
+        after_days = (after['date'] - date.date()).days
+        before_days = (date.date() - before['date']).days
+        total_days = after_days + before_days
+
+        return after['value'] * (after_days / total_days) + before['value'] * (before_days / total_days)
+
+
 
 class MarketData(models.Model):
     market = models.ForeignKey(Market, on_delete=models.DO_NOTHING)
