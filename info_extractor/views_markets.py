@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
 
+from info_extractor.lib.market_data_loader import data_saver_csv
 from info_extractor.models import Market, MarketData
 
 
@@ -36,6 +37,8 @@ def upload_data_form(request, market_id):
 
 
 def upload_data(request, market_id):
-    # TODO
     market = get_object_or_404(Market, id=market_id)
-    pass
+    if 'inflation' in request.FILES:
+        data_saver_csv(request.FILES['inflation'], market.name, 'inflation')
+
+    return HttpResponseRedirect(reverse('info_extractor:market_view', args=(market.id,)))
