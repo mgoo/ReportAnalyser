@@ -27,7 +27,16 @@ def market_list(request):
 def market(request, market_id):
     market = get_object_or_404(Market, id=market_id)
     template = loader.get_template('info_extractor/markets/view.html')
-    return HttpResponse(template.render({'market': market}, request))
+
+    cpi_data = MarketData.objects.\
+        filter(market_id=market.id, measure='CPI').\
+        order_by('date').\
+        values()
+    cpi_data = [(row['date'], row['value']) for row in cpi_data]
+    cpi_data.insert(0, ['Date', 'CPI'])
+
+    context = {'market': market, 'cpi_data': cpi_data}
+    return HttpResponse(template.render(context, request))
 
 
 def upload_data_form(request, market_id):

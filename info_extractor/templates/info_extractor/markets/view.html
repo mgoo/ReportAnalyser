@@ -1,9 +1,61 @@
 {% extends 'info_extractor/markets/layout.html' %}
 
+{% block requiruments %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+
 {% block page-header %}
     Data Overview
 {% endblock %}
 
 {% block content %}
-  {{ market.name }}
+  <div class="chart-dashboard" id="cpi-dashboard">
+        <div class="chart-wrapper" id="cpi-chart"></div>
+        <div class="chart-wrapper" id="cpi-filter"></div>
+  </div>
+{% endblock %}
+
+{% block js %}
+  {{ cpi_data|json_script:"cpi-data" }}
+
+  <script type="text/javascript">
+    let cpi_data = JSON.parse($('#cpi-data').text());
+
+     for (let row_idx = 1; row_idx < cpi_data.length; row_idx++ ) {
+        let date_components = cpi_data[row_idx][0].split("-");
+        cpi_data[row_idx][0] = new Date(date_components[0], date_components[1], date_components[2])
+     }
+
+     google.charts.load('current', {'packages':['corechart', 'controls']});
+     google.charts.setOnLoadCallback(drawCpiChart);
+
+     function drawCpiChart() {
+        let data = google.visualization.arrayToDataTable(cpi_data);
+
+        let dashboard = new google.visualization.Dashboard($('#cpi-dashboard')[0]);
+
+        let dateFilter = new google.visualization.ControlWrapper({
+          'controlType': 'ChartRangeFilter',
+          'containerId': 'cpi-filter',
+          'options': {
+            'filterColumnLabel': 'Date',
+            'height': 20
+          }
+        });
+
+        let chart = new google.visualization.ChartWrapper({
+          'chartType': 'LineChart',
+          'containerId': 'cpi-chart',
+          'options': {
+            'title': 'CPI',
+            'legend': 'none'
+          }
+        });
+
+        dashboard.bind(dateFilter, chart);
+        dashboard.draw(data);
+     }
+  </script>
+
+
 {% endblock %}
