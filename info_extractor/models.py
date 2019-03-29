@@ -11,9 +11,9 @@ class Market(models.Model):
 
 class MarketData(models.Model):
     market = models.ForeignKey(Market, on_delete=models.DO_NOTHING)
-    measure = models.CharField(max_length=128)
+    measure = models.CharField(db_index=True, max_length=128)
     value = models.FloatField()
-    date = models.DateField()
+    date = models.DateField(db_index=True)
 
     def __str__(self):
         return "MarketData {id: %d}" % self.id
