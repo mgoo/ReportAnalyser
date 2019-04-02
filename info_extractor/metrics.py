@@ -80,9 +80,6 @@ class OverTimeMetric:
     def process(self, instrument, start_date, end_date):
         pass
 
-    def columns(self):
-        pass
-
 
 class Price(OverTimeMetric):
 
@@ -151,3 +148,30 @@ class Volume(OverTimeMetric):
         stock_volume.insert(0, ('Date', 'Price'))
 
         return stock_volume
+
+
+class PriceChangePercent(OverTimeMetric):
+
+    def get_name(self):
+        return 'Price Change Percentage'
+
+    def process(self, instrument, start_date, end_date):
+        stock_data = HistoricPrices. \
+            objects. \
+            filter(
+                instrument_id=instrument.id,
+                date__gt=start_date,
+                date__lt=end_date
+            ). \
+            order_by('date'). \
+            values()
+
+        starting_price = stock_data[0]['open']
+        def percent_change(start_price, row):
+            dayly_price = (row['low'] + row['open'] + row['close'] + row['high']) / 4
+            return ((dayly_price - start_price) / start_price) * 100
+
+        stock_price = [(row['date'], percent_change(starting_price, row)) for row in stock_data]
+        stock_price.insert(0, ('Date', 'PriceChange'))
+
+        return stock_price
