@@ -22,7 +22,7 @@ def compare_time_period(request):
 
     context['available_metrics'] = [
         {'name': metric().get_name(), 'class_name': metric().__class__.__name__}
-        for metric in Metric.__subclasses__()
+        for metric in SingleMetric.__subclasses__()
     ]
 
     context['instruments'] = Instrument.objects.all()
@@ -59,5 +59,48 @@ def compare_time_period_results(request):
     }
     return HttpResponse(template.render(context, request))
 
+
 def compare_time_series(request):
-    pass
+    template = loader.get_template('info_extractor/compare/time_series.html')
+
+    context = {}
+
+    context['available_metrics'] = [
+        {'name': metric().get_name(), 'class_name': metric().__class__.__name__}
+        for metric in OverTimeMetric.__subclasses__()
+    ]
+
+    context['instruments'] = Instrument.objects.all()
+
+    return HttpResponse(template.render(context, request))
+
+
+def compare_time_series_results(request):
+    template = loader.get_template('info_extractor/compare/time_series_results.html')
+    instruments = [
+        get_object_or_404(Instrument, id=instrument_id)
+        for instrument_id in request.POST.getlist('instruments')
+    ]
+    metrics = [globals()[metric]() for metric in request.POST.getlist('metrics')]
+    start_date = datetime.datetime.strptime(request.POST['start-date'], '%Y-%m-%d %H:%M')
+    end_date = datetime.datetime.strptime(request.POST['end-date'], '%Y-%m-%d %H:%M')
+
+    data = []
+    for metric in metrics:
+        data.append([])
+        for instrument in instruments:
+            try:
+                metric_value = metric.process(instrument, start_date, end_date)
+            except Exception as e:
+                metric_value = '-'
+                print(e)
+            data[-1].append(metric_value)
+
+    context = {
+        'metrics': metrics,
+        'metric_names': [metric.get_name() for metric in metrics],
+        'instruments': instruments,
+        'instrument_names': ['%s - %s' % (instrument.name, instrument.market.name) for instrument in instruments],
+        'data': data
+    }
+    return HttpResponse(template.render(context, request))

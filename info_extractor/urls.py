@@ -37,6 +37,7 @@ urlpatterns = [
     path('compare/timeperiod', views_compare.compare_time_period, name='compare_timeperiod'),
     path('compare/timeperiodresults', views_compare.compare_time_period_results, name='compare_timeperiod_results'),
     path('compare/timeseries', views_compare.compare_time_series, name='compare_timeseries'),
+    path('compare/timeseriesresults', views_compare.compare_time_series_results, name='compare_timeseries_results'),
 
     path('market/list', views_markets.market_list, name='market_list'),
     path('market/<int:market_id>/view', views_markets.market, name='market_view'),

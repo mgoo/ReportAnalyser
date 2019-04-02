@@ -1,9 +1,9 @@
 from django.db.models import Sum, Max
 
-from info_extractor.models import Dividend
+from info_extractor.models import Dividend, HistoricPrices, Instrument
 
 
-class Metric:
+class SingleMetric:
 
     def get_name(self):
         pass
@@ -12,7 +12,7 @@ class Metric:
         pass
 
 
-class AvgDividendYield(Metric):
+class AvgDividendYield(SingleMetric):
 
     def get_name(self):
         return "Average Dividend Yield"
@@ -31,7 +31,7 @@ class AvgDividendYield(Metric):
         return sum(div_yields) / len(div_yields) * 100
 
 
-class DividendYieldAt(Metric):
+class DividendYieldAt(SingleMetric):
 
     def get_name(self):
         return "Dividend Yield"
@@ -49,7 +49,7 @@ class DividendYieldAt(Metric):
         return dps / instrument.get_price_at(date) * 100
 
 
-class PriceChange(Metric):
+class PriceChange(SingleMetric):
 
     def get_name(self):
         return "Price Change"
@@ -60,7 +60,7 @@ class PriceChange(Metric):
         return (end_price - start_price) / start_price * 100
 
 
-class RealPriceChange(Metric):
+class RealPriceChange(SingleMetric):
 
     def get_name(self):
         return "Real Price Change"
@@ -70,3 +70,84 @@ class RealPriceChange(Metric):
         end_price = instrument.market.convert_price(instrument.get_price_at(end_date), end_date, end_date)
 
         return (end_price - start_price) / start_price * 100
+
+
+class OverTimeMetric:
+
+    def get_name(self):
+        pass
+
+    def process(self, instrument, start_date, end_date):
+        pass
+
+    def columns(self):
+        pass
+
+
+class Price(OverTimeMetric):
+
+    def get_name(self):
+        return 'Price'
+
+    def process(self, instrument, start_date, end_date):
+        stock_data = HistoricPrices. \
+            objects. \
+            filter(
+                instrument_id=instrument.id,
+                date__gt=start_date,
+                date__lt=end_date
+            ). \
+            order_by('date'). \
+            values()
+
+        stock_price = [(row['date'], (row['low'] + row['open'] + row['close'] + row['high']) / 4) for row in stock_data]
+        stock_price.insert(0, ('Date', 'Price'))
+
+        return stock_price
+
+
+class RealPrice(OverTimeMetric):
+
+    def get_name(self):
+        return 'Real Price'
+
+    def process(self, instrument: Instrument, start_date, end_date):
+        stock_data = HistoricPrices. \
+            objects. \
+            filter(
+                instrument_id=instrument.id,
+                date__gt=start_date,
+                date__lt=end_date
+            ).\
+            order_by('date'). \
+            values()
+
+        stock_price = [
+            (row['date'], instrument.market.convert_price((row['low'] + row['open'] + row['close'] + row['high']) / 4, row['date'], start_date))
+            for row in stock_data
+        ]
+        stock_price.insert(0, ('Date', 'Price'))
+
+        return stock_price
+
+
+class Volume(OverTimeMetric):
+
+    def get_name(self):
+        return 'Volume'
+
+    def process(self, instrument, start_date, end_date):
+        stock_data = HistoricPrices. \
+            objects. \
+            filter(
+                instrument_id=instrument.id,
+                date__gt=start_date,
+                date__lt=end_date
+            ). \
+            order_by('date'). \
+            values()
+
+        stock_volume = [(row['date'], row['volume']) for row in stock_data]
+        stock_volume.insert(0, ('Date', 'Price'))
+
+        return stock_volume

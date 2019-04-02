@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.db.models import Max
 
@@ -16,6 +18,8 @@ class Market(models.Model):
 
 
     def cpi_at(self, date):
+        if isinstance(date, datetime.datetime):
+            date = date.date()
         cpi_query = MarketData.objects.filter(market_id=self.id, measure='CPI')
 
         after = cpi_query.filter(date__gte=date).order_by('date').values()
@@ -28,9 +32,14 @@ class Market(models.Model):
 
         after = after[0]
         before = before[0]
-        after_days = (after['date'] - date.date()).days
-        before_days = (date.date() - before['date']).days
+        after_days = (after['date'] - date).days
+        before_days = (date - before['date']).days
         total_days = after_days + before_days
+
+        if after_days == 0:
+            return after['value']
+        if before_days == 0:
+            return before['value']
 
         return after['value'] * (after_days / total_days) + before['value'] * (before_days / total_days)
 

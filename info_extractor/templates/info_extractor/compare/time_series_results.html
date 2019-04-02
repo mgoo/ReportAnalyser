@@ -1,0 +1,84 @@
+{% extends 'info_extractor/compare/layout.html' %}
+
+{% block requiruments %}
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+
+{% block page-header %}
+  Time series Comparison
+{% endblock %}
+
+{% block content %}
+  {% for metric in metrics %}
+    <div class="chart-dashboard" id="dashboard-{{ forloop.counter0 }}">
+      <div class="chart-wrapper" id="chart-{{ forloop.counter0 }}"></div>
+      <div class="chart-wrapper" id="filter-{{ forloop.counter0 }}"></div>
+    </div>
+  {% endfor %}
+{% endblock %}
+
+{% block js %}
+  {{ data|json_script:"data" }}
+
+  <script type="text/javascript">
+    let data = JSON.parse($('#data').text());
+    let metric_names = {{ metric_names|safe }};
+    let instrument_names = {{ instrument_names|safe }};
+
+    google.charts.load('current', {'packages':['corechart', 'controls']});
+    google.charts.setOnLoadCallback(drawAllCharts);
+
+    function drawAllCharts() {
+      data.forEach(function (metric_data, metric_index) {
+        let metric_data_table = null;
+
+        metric_data.forEach(function (instrument_data, instrument_index) {
+          for (row_idx = 1; row_idx < instrument_data.length; row_idx++) {
+            let date_components = instrument_data[row_idx][0].split("-");
+            instrument_data[row_idx][0] = new Date(date_components[0], date_components[1], date_components[2])
+          }
+          instrument_data_table = google.visualization.arrayToDataTable(instrument_data);
+          instrument_data_table.setColumnLabel(1, instrument_names[instrument_index]);
+          if (metric_data_table == null) {
+            metric_data_table = instrument_data_table
+          } else {
+            metric_data_table = google.visualization.data.join(
+                metric_data_table,
+                instrument_data_table,
+                "full",
+                [[0, 0]],
+                Array(instrument_index).fill(0).map(Number.call, Number).map(value => value + 1),
+                [1]
+            );
+          }
+        });
+        drawMetricChart(metric_index, metric_data_table);
+      });
+    }
+
+    function drawMetricChart(index, data){
+      let dashboard = new google.visualization.Dashboard($('#dashboard-' + index)[0]);
+
+        let dateFilter = new google.visualization.ControlWrapper({
+          'controlType': 'ChartRangeFilter',
+          'containerId': 'filter-' + index,
+          'options': {
+            'filterColumnLabel': 'Date',
+            'height': 50
+          }
+        });
+
+        let chart = new google.visualization.ChartWrapper({
+          'chartType': 'LineChart',
+          'containerId': 'chart-' + index,
+          'options': {
+            'title': metric_names[index],
+            'legend': 'right'
+          }
+        });
+
+        dashboard.bind(dateFilter, chart);
+        dashboard.draw(data);
+    }
+  </script>
+{% endblock %}
